@@ -13,6 +13,7 @@ const BALL_SIZE = 48
 class FloatingBallManager {
   private ballWindow: BrowserWindow | null = null
   private enabled = false
+  private letter = 'Z' // 悬浮球显示的文字，默认 Z
   // 拖拽状态：记录拖拽开始时鼠标相对窗口左上角的偏移
   private dragOffsetX = 0
   private dragOffsetY = 0
@@ -33,6 +34,7 @@ class FloatingBallManager {
     try {
       const data = await databaseAPI.dbGet('settings-general')
       this.enabled = data?.floatingBallEnabled ?? false
+      this.letter = data?.floatingBallLetter || 'Z'
 
       if (this.enabled) {
         await this.createBallWindow()
@@ -108,6 +110,16 @@ class FloatingBallManager {
     ipcMain.handle('floating-ball:get-enabled', () => {
       return this.enabled
     })
+
+    // 外部控制：设置悬浮球文字
+    ipcMain.handle('floating-ball:set-letter', async (_event, letter: string) => {
+      return this.setLetter(letter)
+    })
+
+    // 外部控制：获取悬浮球文字
+    ipcMain.handle('floating-ball:get-letter', () => {
+      return this.letter
+    })
   }
 
   /**
@@ -156,6 +168,13 @@ class FloatingBallManager {
 
     // 加载悬浮球页面
     this.ballWindow.loadFile(floatingBallHtml)
+
+    // 页面加载完成后发送配置的文字
+    this.ballWindow.webContents.on('did-finish-load', () => {
+      if (this.ballWindow && !this.ballWindow.isDestroyed()) {
+        this.ballWindow.webContents.send('floating-ball-set-letter', this.letter)
+      }
+    })
 
     // 防止窗口被意外关闭
     this.ballWindow.on('close', (event) => {
@@ -267,6 +286,30 @@ class FloatingBallManager {
       console.log('[FloatingBall] 悬浮球已', enabled ? '启用' : '禁用')
     } catch (error) {
       console.error('[FloatingBall] 保存悬浮球设置失败:', error)
+    }
+
+    return { success: true }
+  }
+
+  /**
+   * 设置悬浮球显示文字
+   */
+  public async setLetter(letter: string): Promise<{ success: boolean }> {
+    this.letter = letter || 'Z'
+
+    // 通知悬浮球窗口更新文字
+    if (this.ballWindow && !this.ballWindow.isDestroyed()) {
+      this.ballWindow.webContents.send('floating-ball-set-letter', this.letter)
+    }
+
+    // 保存到数据库
+    try {
+      const data = (await databaseAPI.dbGet('settings-general')) || {}
+      data.floatingBallLetter = this.letter
+      await databaseAPI.dbPut('settings-general', data)
+      console.log('悬浮球文字已更新:', this.letter)
+    } catch (error) {
+      console.error('保存悬浮球文字失败:', error)
     }
 
     return { success: true }

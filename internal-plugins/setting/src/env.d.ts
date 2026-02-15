@@ -144,6 +144,9 @@ declare global {
         setTheme: (theme: string) => Promise<void>
         updatePrimaryColor: (primaryColor: string, customColor?: string) => Promise<void>
         setTrayIconVisible: (visible: boolean) => Promise<void>
+        setFloatingBallEnabled: (enabled: boolean) => Promise<{ success: boolean }>
+        setFloatingBallLetter: (letter: string) => Promise<{ success: boolean }>
+        getFloatingBallLetter: () => Promise<string>
         setLaunchAtLogin: (enable: boolean) => Promise<void>
         getLaunchAtLogin: () => Promise<boolean>
         setProxyConfig: (config: { enabled: boolean; url: string }) => Promise<{

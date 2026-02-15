@@ -184,6 +184,14 @@
       ipcRenderer.send('floating-ball-contextmenu')
     })
 
+    // ==================== 接收文字配置 ====================
+    const letterEl = document.querySelector('.floating-ball-letter')
+    ipcRenderer.on('floating-ball-set-letter', (_event, letter) => {
+      if (letterEl) {
+        letterEl.textContent = letter || 'Z'
+      }
+    })
+
     // ==================== 文件拖放（从 Finder / 资源管理器拖入文件） ====================
     document.addEventListener('dragover', (e) => {
       e.preventDefault()

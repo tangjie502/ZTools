@@ -608,6 +608,10 @@ window.ztools = {
       await electron.ipcRenderer.invoke('floating-ball:set-enabled', enabled),
     getFloatingBallEnabled: async () =>
       await electron.ipcRenderer.invoke('floating-ball:get-enabled'),
+    setFloatingBallLetter: async (letter) =>
+      await electron.ipcRenderer.invoke('floating-ball:set-letter', letter),
+    getFloatingBallLetter: async () =>
+      await electron.ipcRenderer.invoke('floating-ball:get-letter'),
 
     // ==================== 调试日志 API ====================
     logEnable: async () => await electron.ipcRenderer.invoke('internal:log-enable'),

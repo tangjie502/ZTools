@@ -471,6 +471,26 @@
       </div>
     </div>
 
+    <!-- 悬浮球文字 -->
+    <div v-if="floatingBallEnabled" class="setting-item sub-setting">
+      <div class="setting-label">
+        <span>悬浮球文字</span>
+        <span class="setting-desc">自定义悬浮球上显示的文字，默认为 Z</span>
+      </div>
+      <div class="setting-control">
+        <input
+          v-model="floatingBallLetter"
+          type="text"
+          class="input"
+          placeholder="Z"
+          maxlength="2"
+          style="width: 60px; text-align: center;"
+          @blur="handleFloatingBallLetterChange"
+          @keyup.enter="handleFloatingBallLetterChange"
+        />
+      </div>
+    </div>
+
     <!-- 开机启动设置 -->
     <div class="setting-item">
       <div class="setting-label">
@@ -704,6 +724,7 @@ const showTrayIcon = ref(true)
 
 // 悬浮球设置
 const floatingBallEnabled = ref(false)
+const floatingBallLetter = ref('Z')
 
 // 开机启动设置
 const launchAtLogin = ref(false)
@@ -1155,6 +1176,18 @@ async function handleFloatingBallChange(): Promise<void> {
   }
 }
 
+// 处理悬浮球文字变化
+async function handleFloatingBallLetterChange(): Promise<void> {
+  try {
+    const letter = floatingBallLetter.value.trim() || 'Z'
+    floatingBallLetter.value = letter
+    await window.ztools.internal.setFloatingBallLetter(letter)
+    console.log('悬浮球文字已更新:', letter)
+  } catch (err) {
+    console.error('更新悬浮球文字失败:', err)
+  }
+}
+
 // 处理窗口材质变化
 async function handleWindowMaterialChange(): Promise<void> {
   try {
@@ -1484,6 +1517,7 @@ async function loadSettings(): Promise<void> {
 
       // 悬浮球配置
       floatingBallEnabled.value = data.floatingBallEnabled ?? false
+      floatingBallLetter.value = data.floatingBallLetter || 'Z'
 
       // 加载自定义颜色
       if (data.customColor) {
