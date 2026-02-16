@@ -19,8 +19,10 @@
           <img v-if="item._resolvedIcon || item.icon" :src="item._resolvedIcon || item.icon" alt="" draggable="false" />
         </div>
         <div class="item-content">
-          <div class="item-text">{{ item.text }}</div>
-          <div v-if="item.title" class="item-title">{{ item.title }}</div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div class="item-text" v-html="getHighlightedText(item.text)"></div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <div v-if="item.title" class="item-title" v-html="getHighlightedText(item.title)"></div>
         </div>
       </div>
     </div>
@@ -29,23 +31,30 @@
 
 <script setup lang="ts">
 import type { MainPushItem } from '../../composables/useMainPushResults'
+import { highlightSubstring } from '../../utils/highlight'
 
 interface Props {
   title: string
   icon?: string // 标题行图标
   items: MainPushItem[]
   selectedIndex?: number
+  searchQuery?: string // 搜索查询（用于高亮）
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   selectedIndex: -1,
-  icon: ''
+  icon: '',
+  searchQuery: ''
 })
 
 defineEmits<{
   (e: 'select', item: MainPushItem, index: number): void
   (e: 'enter-app'): void
 }>()
+
+function getHighlightedText(text: string): string {
+  return highlightSubstring(text, props.searchQuery)
+}
 </script>
 
 <style scoped>
@@ -164,5 +173,13 @@ defineEmits<{
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 16px;
+}
+
+/* 高亮样式 */
+.item-text :deep(mark.highlight),
+.item-title :deep(mark.highlight) {
+  background-color: transparent;
+  color: var(--highlight-color);
+  font-weight: 600;
 }
 </style>

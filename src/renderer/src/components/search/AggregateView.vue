@@ -99,6 +99,7 @@
         :icon="group.featureIcon || group.pluginLogo"
         :items="group.items"
         :selected-index="getMainPushSelectedIndex(group.featureKey)"
+        :search-query="searchQuery"
         @select="(item, _index) => $emit('select-main-push', group, item)"
         @enter-app="$emit('enter-main-push-app', group)"
       />
