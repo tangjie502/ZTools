@@ -37,12 +37,12 @@
                 {{ plugin.title || plugin.name }}
                 <span class="plugin-version">v{{ plugin.version }}</span>
                 <span v-if="plugin.isDevelopment" class="dev-badge">开发中</span>
+                <span v-if="isPluginRunning(plugin.path)" class="running-badge">
+                  <span class="status-dot"></span>
+                  运行中
+                </span>
               </div>
               <div class="plugin-desc">{{ plugin.description || '暂无描述' }}</div>
-              <div v-if="isPluginRunning(plugin.path)" class="plugin-status running">
-                <span class="status-dot"></span>
-                运行中
-              </div>
             </div>
 
             <div class="plugin-meta">
@@ -723,30 +723,22 @@ function closePluginDetail(): void {
   border: 1px solid var(--purple-border);
 }
 
-.plugin-desc {
-  font-size: 13px;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.plugin-status {
-  display: flex;
+.running-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 12px;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 500;
-}
-
-.plugin-status.running {
   color: var(--success-color);
+  background: var(--success-light-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--success-color);
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--success-color);
   animation: pulse-dot 2s infinite;
@@ -760,6 +752,14 @@ function closePluginDetail(): void {
   50% {
     opacity: 0.5;
   }
+}
+
+.plugin-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .plugin-meta {
