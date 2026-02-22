@@ -1323,6 +1323,66 @@ class PluginManager {
     const pluginInfo = this.getPluginInfoByWebContents(event.sender)
     return pluginInfo?.isInternal ?? false
   }
+
+  /**
+   * 获取指定插件的内存使用情况
+   * @param pluginPath 插件路径
+   * @returns 内存信息（单位：MB）
+   */
+  public async getPluginMemoryInfo(pluginPath: string): Promise<{
+    private: number
+    shared: number
+    total: number
+  } | null> {
+    const plugin = this.pluginViews.find((v) => v.path === pluginPath)
+    if (!plugin) {
+      console.warn('[Plugin] 未找到插件视图:', pluginPath)
+      console.log('[Plugin] 当前运行中的插件:', this.pluginViews.map(v => v.path))
+      return null
+    }
+    
+    if (plugin.view.webContents.isDestroyed()) {
+      console.warn('[Plugin] 插件 webContents 已销毁:', pluginPath)
+      return null
+    }
+
+    try {
+      // 获取操作系统进程 ID（而不是 Chromium 内部 ID）
+      const processId = plugin.view.webContents.getOSProcessId()
+      // 使用 app.getAppMetrics() 获取所有进程的内存信息
+      const { app } = await import('electron')
+      const metrics = app.getAppMetrics()
+
+      // 找到对应进程的内存信息
+      const processMetric = metrics.find((metric) => metric.pid === processId)
+      
+      if (!processMetric) {
+        console.warn('[Plugin] 未找到进程指标，进程ID:', processId)
+        console.log('[Plugin] 所有进程ID:', metrics.map(m => m.pid))
+        return null
+      }
+      
+      if (!processMetric.memory) {
+        console.warn('[Plugin] 进程指标中没有内存信息:', processMetric)
+        return null
+      }
+      // memory.workingSetSize 是工作集大小（KB）
+      // memory.privateBytes 是私有字节数（KB）
+      const workingSetSize = processMetric.memory.workingSetSize || 0
+      const privateBytes = processMetric.memory.privateBytes || 0
+
+      // 转换为 MB
+      const result = {
+        private: Math.round(privateBytes / 1024),
+        shared: Math.round((workingSetSize - privateBytes) / 1024),
+        total: Math.round(workingSetSize / 1024)
+      }
+      return result
+    } catch (error) {
+      console.error('[Plugin] 获取插件内存信息失败:', error)
+      return null
+    }
+  }
 }
 
 export default new PluginManager()

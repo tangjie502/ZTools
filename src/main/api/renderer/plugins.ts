@@ -102,6 +102,16 @@ export class PluginsAPI {
         }
       }
     )
+
+    ipcMain.handle('get-plugin-memory-info', async (_event, pluginPath: string) => {
+      try {
+        const memoryInfo = await this.pluginManager.getPluginMemoryInfo(pluginPath)
+        return { success: true, data: memoryInfo }
+      } catch (error: unknown) {
+        console.error('[Plugins] 获取插件内存信息失败:', error)
+        return { success: false, error: error instanceof Error ? error.message : '获取失败' }
+      }
+    })
   }
 
   // 获取插件列表（过滤掉内置插件，用于插件中心显示）

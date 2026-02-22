@@ -471,6 +471,8 @@ window.ztools = {
       await electron.ipcRenderer.invoke('internal:clear-plugin-data', pluginName),
     packagePlugin: async (pluginPath) =>
       await electron.ipcRenderer.invoke('internal:package-plugin', pluginPath),
+    getPluginMemoryInfo: async (pluginPath) =>
+      await electron.ipcRenderer.invoke('internal:get-plugin-memory-info', pluginPath),
 
     // ==================== 全局快捷键 API ====================
     registerGlobalShortcut: async (shortcut, target) =>

@@ -269,6 +269,58 @@
           </div>
           <div class="meta-value">{{ formatSize(plugin.size) || '-' }}</div>
         </div>
+
+        <div v-if="plugin.installed && isRunning" class="meta-divider"></div>
+
+        <div v-if="plugin.installed && isRunning" class="meta-item">
+          <div class="meta-label">内存</div>
+          <div class="meta-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="2"
+                y="5"
+                width="20"
+                height="14"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M7 9L7 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M12 9L12 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M17 9L17 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <div v-if="memoryLoading" class="meta-value">
+            <span class="memory-loading">...</span>
+          </div>
+          <div v-else-if="memoryInfo" class="meta-value">
+            {{ memoryInfo.total }} MB
+          </div>
+          <div v-else class="meta-value">-</div>
+        </div>
       </div>
     </div>
 
@@ -597,6 +649,11 @@ const currentDocContent = ref<any>(null)
 const currentDocType = ref<'document' | 'attachment'>('document')
 const isClearing = ref(false)
 
+// 内存信息状态
+const memoryInfo = ref<{ private: number; shared: number; total: number } | null>(null)
+const memoryLoading = ref(false)
+let memoryUpdateTimer: NodeJS.Timeout | null = null
+
 // 配置 marked
 marked.setOptions({
   breaks: true, // 支持 GitHub 风格的换行
@@ -870,8 +927,82 @@ function openHomepage(): void {
   }
 }
 
+// 加载插件内存信息
+async function loadMemoryInfo(): Promise<void> {
+  console.log('[PluginDetail] 开始加载内存信息', {
+    pluginName: props.plugin.name,
+    pluginPath: props.plugin.path,
+    isRunning: props.isRunning
+  })
+
+  if (!props.plugin.path) {
+    console.warn('[PluginDetail] 插件路径不存在')
+    memoryInfo.value = null
+    return
+  }
+
+  if (!props.isRunning) {
+    console.log('[PluginDetail] 插件未运行，不获取内存信息')
+    memoryInfo.value = null
+    return
+  }
+
+  memoryLoading.value = true
+  try {
+    console.log('[PluginDetail] 调用 API 获取内存信息，路径:', props.plugin.path)
+    const result = await window.ztools.internal.getPluginMemoryInfo(props.plugin.path)
+    console.log('[PluginDetail] API 返回结果:', result)
+    
+    if (result.success && result.data) {
+      console.log('[PluginDetail] 成功获取内存信息:', result.data)
+      memoryInfo.value = result.data
+    } else {
+      console.warn('[PluginDetail] API 返回失败或数据为空:', result)
+      memoryInfo.value = null
+    }
+  } catch (error) {
+    console.error('[PluginDetail] 获取插件内存信息失败:', error)
+    memoryInfo.value = null
+  } finally {
+    memoryLoading.value = false
+  }
+}
+
+// 启动内存信息定时更新
+function startMemoryUpdate(): void {
+  console.log('[PluginDetail] 启动内存信息定时更新')
+  
+  // 立即加载一次
+  loadMemoryInfo()
+
+  // 每 3 秒更新一次
+  if (memoryUpdateTimer) {
+    clearInterval(memoryUpdateTimer)
+  }
+  memoryUpdateTimer = setInterval(() => {
+    loadMemoryInfo()
+  }, 3000)
+}
+
+// 停止内存信息更新
+function stopMemoryUpdate(): void {
+  console.log('[PluginDetail] 停止内存信息更新')
+  if (memoryUpdateTimer) {
+    clearInterval(memoryUpdateTimer)
+    memoryUpdateTimer = null
+  }
+  memoryInfo.value = null
+}
+
 // 组件挂载时加载 README 和插件设置
 onMounted(() => {
+  console.log('[PluginDetail] 组件挂载', {
+    pluginName: props.plugin.name,
+    pluginPath: props.plugin.path,
+    isRunning: props.isRunning,
+    installed: props.plugin.installed
+  })
+  
   // 无论是否安装，只要有插件信息就尝试加载
   if (props.plugin.name || props.plugin.path) {
     loadReadme()
@@ -879,11 +1010,19 @@ onMounted(() => {
   if (props.plugin.installed && props.plugin.name) {
     loadPluginSettings()
   }
+  // 如果插件正在运行，启动内存监控
+  if (props.isRunning) {
+    console.log('[PluginDetail] 插件正在运行，启动内存监控')
+    startMemoryUpdate()
+  } else {
+    console.log('[PluginDetail] 插件未运行，不启动内存监控')
+  }
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  stopMemoryUpdate()
 })
 
 // 插件变化时重新加载设置
@@ -892,6 +1031,22 @@ watch(
   () => {
     if (props.plugin.installed && props.plugin.name) {
       loadPluginSettings()
+    }
+  }
+)
+
+// 监听插件运行状态变化
+watch(
+  () => props.isRunning,
+  (newValue) => {
+    console.log('[PluginDetail] 插件运行状态变化:', {
+      pluginName: props.plugin.name,
+      isRunning: newValue
+    })
+    if (newValue) {
+      startMemoryUpdate()
+    } else {
+      stopMemoryUpdate()
     }
   }
 )
@@ -1196,6 +1351,11 @@ watch(
 
 .meta-value.author-link.clickable:hover {
   opacity: 0.7;
+}
+
+.memory-loading {
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .meta-divider {

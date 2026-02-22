@@ -132,6 +132,15 @@ declare global {
           success: boolean
           error?: string
         }>
+        getPluginMemoryInfo: (pluginPath: string) => Promise<{
+          success: boolean
+          data?: {
+            private: number
+            shared: number
+            total: number
+          } | null
+          error?: string
+        }>
 
         // 快捷键相关
         startHotkeyRecording: () => Promise<{ success: boolean; error?: string }>
