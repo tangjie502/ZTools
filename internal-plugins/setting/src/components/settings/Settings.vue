@@ -240,6 +240,7 @@ function handlePluginInstalled(pluginName: string): void {
   width: 200px;
   border-right: 1px solid var(--divider-color);
   padding: 12px 8px;
+  overflow-y: auto;
 }
 
 .menu-item {
