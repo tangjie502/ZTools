@@ -27,7 +27,7 @@
               {{ isImporting ? '导入中...' : '导入本地插件' }}
             </button>
             <div class="more-menu-wrapper">
-              <button class="btn" @click="toggleMoreMenu">
+              <button class="btn btn-more" @click="toggleMoreMenu">
                 更多
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -39,7 +39,6 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  style="margin-left: 4px"
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
@@ -1113,6 +1112,16 @@ async function handleInstallFromNpm(data: {
 .more-menu-wrapper {
   position: relative;
   z-index: 10000;
+}
+
+.more-menu-wrapper .btn-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.more-menu-wrapper .btn-more svg {
+  flex-shrink: 0;
 }
 
 .more-menu {
