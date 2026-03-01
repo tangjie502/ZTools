@@ -85,6 +85,7 @@ declare global {
           param?: any
           name?: string
         }) => Promise<{ success: boolean; error?: string }>
+        quitApp: () => Promise<{ success: boolean }>
         openApp: (appPath: string) => Promise<void>
 
         // 插件市场

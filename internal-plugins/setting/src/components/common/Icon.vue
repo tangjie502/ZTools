@@ -468,26 +468,30 @@
       stroke-linejoin="round"
     />
 
-    <!-- 打包图标 - Package (云上传) -->
+    <!-- 打包图标 - Package (压缩盒子) -->
     <path
       v-if="name === 'package'"
-      d="M16 16L12 12L8 16"
+      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <polyline
+      v-if="name === 'package'"
+      points="3.27 6.96 12 12.01 20.73 6.96"
       stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
-    <path
+    <line
       v-if="name === 'package'"
-      d="M12 12V21"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      v-if="name === 'package'"
-      d="M20.39 18.39A5 5 0 0 0 18 9H16.74A8 8 0 1 0 3 16.3"
+      x1="12"
+      y1="22.08"
+      x2="12"
+      y2="12"
       stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"

@@ -1,5 +1,6 @@
-import { IpcMainInvokeEvent, ipcMain } from 'electron'
+import { app, IpcMainInvokeEvent, ipcMain } from 'electron'
 import type { PluginManager } from '../../managers/pluginManager'
+import windowManager from '../../managers/windowManager.js'
 import logCollector from '../../core/logCollector.js'
 import detachedWindowManager from '../../core/detachedWindowManager.js'
 import floatingBallManager from '../../core/floatingBallManager.js'
@@ -81,6 +82,16 @@ export class InternalPluginAPI {
       }
       console.log('[Internal] 启动应用', options)
       return await (commandsAPI as any).launch(options)
+    })
+
+    ipcMain.handle('internal:quit-app', async (event) => {
+      if (!requireInternalPlugin(this.pluginManager, event)) {
+        throw new PermissionDeniedError('internal:quit-app')
+      }
+      // 与托盘「退出」一致：设置退出标志后再 quit，否则 before-quit 会阻止并只隐藏窗口
+      windowManager.setQuitting(true)
+      app.quit()
+      return { success: true }
     })
 
     // ==================== 指令管理 API ====================

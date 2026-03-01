@@ -436,6 +436,7 @@ window.ztools = {
 
     // ==================== 应用启动 API ====================
     launch: async (params) => await electron.ipcRenderer.invoke('internal:launch', params),
+    quitApp: async () => await electron.ipcRenderer.invoke('internal:quit-app'),
 
     // ==================== 指令管理 API ====================
     getCommands: async () => await electron.ipcRenderer.invoke('internal:get-commands'),

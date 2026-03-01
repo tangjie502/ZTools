@@ -93,6 +93,12 @@
           "maxLength": 1
         }
       ]
+    },
+    {
+      "code": "exit",
+      "explain": "退出 ZTools",
+      "icon": "logo.png",
+      "cmds": ["退出 ZTools"]
     }
   ]
 }

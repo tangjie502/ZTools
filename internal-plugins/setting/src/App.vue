@@ -54,6 +54,12 @@ onMounted(() => {
   window.ztools.onPluginEnter((action) => {
     console.log('设置插件启动:', action)
 
+    // 退出 ZTools：直接调用退出并返回，不切换页面
+    if (action.code === 'exit') {
+      window.ztools.internal.quitApp()
+      return
+    }
+
     // 非默认 feature code 才需要跳转页面（默认已在退出时重置为 general）
     const pageMap: Record<string, string> = {
       shortcuts: 'shortcuts',
