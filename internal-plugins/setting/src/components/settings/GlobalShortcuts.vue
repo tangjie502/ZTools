@@ -239,40 +239,37 @@ interface GlobalShortcut {
 const isMac = ref(false)
 const isWindows = ref(false)
 
-// 固定的应用快捷键（根据平台不同）
-const builtInAppShortcuts = computed<GlobalShortcut[]>(() => {
-  if (isMac.value) {
-    return [
-      {
-        id: 'builtin-settings',
-        shortcut: 'Cmd+,',
-        target: '打开设置',
-        enabled: true
-      },
-      {
-        id: 'builtin-detach',
-        shortcut: 'Cmd+D',
-        target: '分离窗口',
-        enabled: true
-      }
-    ]
-  } else if (isWindows.value) {
-    return [
-      {
-        id: 'builtin-settings',
-        shortcut: 'Ctrl+,',
-        target: '打开设置',
-        enabled: true
-      },
-      {
-        id: 'builtin-detach',
-        shortcut: 'Ctrl+D',
-        target: '分离窗口',
-        enabled: true
-      }
-    ]
+// 基础内置快捷键配置（使用 MOD 占位符表示 Cmd/Ctrl）
+const baseBuiltInShortcuts = [
+  {
+    id: 'builtin-detach',
+    shortcut: 'MOD+D',
+    target: '分离窗口',
+    enabled: true
+  },
+  {
+    id: 'builtin-search',
+    shortcut: 'MOD+F',
+    target: '固定搜索框的文本，搜索匹配的命令',
+    enabled: true
+  },
+  {
+    id: 'builtin-settings',
+    shortcut: 'MOD+,',
+    target: '打开设置',
+    enabled: true
   }
-  return []
+]
+
+// 根据平台转换快捷键修饰符
+const builtInAppShortcuts = computed<GlobalShortcut[]>(() => {
+  const modifier = isMac.value ? 'Command' : isWindows.value ? 'Ctrl' : ''
+  if (!modifier) return []
+  
+  return baseBuiltInShortcuts.map(item => ({
+    ...item,
+    shortcut: item.shortcut.replace('MOD', modifier)
+  }))
 })
 
 // Tab 切换
