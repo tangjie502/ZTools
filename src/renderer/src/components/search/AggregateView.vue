@@ -93,17 +93,17 @@
       />
     </div>
     <div class="content-section">
-        <!-- 窗口匹配栏 -->
-        <CollapsibleList
-          v-if="windowMatchedActions.length > 0"
-          :title="windowMatchTitle || '窗口命令'"
-          :apps="windowMatchedActions"
-          :selected-index="getAbsoluteIndexForSection('window')"
-          :empty-text="''"
-          :draggable="false"
-          @select="$emit('select-window', $event)"
-        />
-      </div>
+      <!-- 窗口匹配栏 -->
+      <CollapsibleList
+        v-if="windowMatchedActions.length > 0"
+        :title="windowMatchTitle || '窗口命令'"
+        :apps="windowMatchedActions"
+        :selected-index="getAbsoluteIndexForSection('window')"
+        :empty-text="''"
+        :draggable="false"
+        @select="$emit('select-window', $event)"
+      />
+    </div>
   </div>
 </template>
 

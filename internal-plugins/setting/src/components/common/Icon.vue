@@ -544,7 +544,15 @@
       stroke-linecap="round"
       stroke-linejoin="round"
     />
-    <circle v-if="name === 'info'" cx="12" cy="8" r="0.5" fill="currentColor" stroke="currentColor" stroke-width="1" />
+    <circle
+      v-if="name === 'info'"
+      cx="12"
+      cy="8"
+      r="0.5"
+      fill="currentColor"
+      stroke="currentColor"
+      stroke-width="1"
+    />
 
     <!-- AI 模型图标 - Brain -->
     <path

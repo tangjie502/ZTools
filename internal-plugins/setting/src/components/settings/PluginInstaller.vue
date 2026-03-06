@@ -63,10 +63,7 @@
       <div v-if="pluginInfo.isInstalled" class="installed-warning">
         <div class="warning-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-              fill="currentColor"
-            />
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor" />
           </svg>
         </div>
         <div class="warning-content">
@@ -99,10 +96,7 @@
           <div class="dialog-header">
             <div class="dialog-icon dialog-icon-warning">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-                  fill="currentColor"
-                />
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor" />
               </svg>
             </div>
             <h3 class="dialog-title">安全提示</h3>
@@ -122,9 +116,7 @@
           </div>
           <div class="dialog-footer">
             <button class="btn btn-secondary" @click="showSecurityDialog = false">取消</button>
-            <button class="btn btn-danger-solid" @click="confirmInstall">
-              已知风险，继续安装
-            </button>
+            <button class="btn btn-danger-solid" @click="confirmInstall">已知风险，继续安装</button>
           </div>
         </div>
       </div>

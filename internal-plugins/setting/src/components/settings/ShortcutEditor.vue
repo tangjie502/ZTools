@@ -32,12 +32,7 @@
         <!-- 目标指令输入 -->
         <div class="form-item">
           <label class="form-label">目标指令</label>
-          <input
-            v-model="targetCommand"
-            type="text"
-            class="input"
-            placeholder="例如：微信、翻译"
-          />
+          <input v-model="targetCommand" type="text" class="input" placeholder="例如：微信、翻译" />
           <span class="form-hint"
             >支持「指令名称」或「插件名称/指令名称」格式，建议加上插件名称以避免歧义</span
           >

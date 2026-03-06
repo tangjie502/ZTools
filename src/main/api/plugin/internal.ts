@@ -32,7 +32,10 @@ class PermissionDeniedError extends Error {
  * @param event IPC 事件对象
  * @returns 是否允许调用（内置插件或主渲染进程）
  */
-export function requireInternalPlugin(pluginManager: PluginManager | null, event: IpcMainInvokeEvent): boolean {
+export function requireInternalPlugin(
+  pluginManager: PluginManager | null,
+  event: IpcMainInvokeEvent
+): boolean {
   if (!pluginManager) return true // 没有 pluginManager，允许通过
   const pluginInfo = pluginManager.getPluginInfoByWebContents(event.sender)
 
@@ -572,7 +575,7 @@ export class InternalPluginAPI {
         throw new PermissionDeniedError('internal:update-local-app-search')
       }
       // 更新 commandsAPI 中的配置
-      (commandsAPI as any).setLocalAppSearch(enabled)
+      ;(commandsAPI as any).setLocalAppSearch(enabled)
       return { success: true }
     })
 

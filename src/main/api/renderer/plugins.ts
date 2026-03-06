@@ -750,7 +750,8 @@ export class PluginsAPI {
     try {
       // 读取设置，检查是否有自定义插件市场 URL
       const settings = databaseAPI.dbGet('settings-general')
-      const defaultBaseUrl = 'https://github.com/ZToolsCenter/ZTools-plugins/releases/latest/download'
+      const defaultBaseUrl =
+        'https://github.com/ZToolsCenter/ZTools-plugins/releases/latest/download'
       let baseUrl = defaultBaseUrl
 
       if (settings?.pluginMarketCustom && settings?.pluginMarketUrl) {
@@ -1014,7 +1015,8 @@ export class PluginsAPI {
         return { success: false, error: '暂无详情' }
       }
 
-      let content = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
+      let content =
+        typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
 
       // 替换 Markdown 图片语法：![alt](path)
       content = content.replace(/!\[([^\]]*)\]\((?!http)([^)]+)\)/g, (_match, alt, path) => {
@@ -1054,9 +1056,7 @@ export class PluginsAPI {
   }
 
   // 获取插件存储的数据库数据
-  private getPluginDbData(
-    pluginName: string
-  ): { success: boolean; data?: any; error?: string } {
+  private getPluginDbData(pluginName: string): { success: boolean; data?: any; error?: string } {
     try {
       // 获取以插件名为前缀的所有数据
       const prefix = `PLUGIN/${pluginName}/`

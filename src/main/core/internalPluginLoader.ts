@@ -33,7 +33,10 @@ export function loadInternalPlugins(): void {
       const pluginJsonPath = path.join(effectivePluginPath, 'plugin.json')
 
       if (!fsSync.existsSync(pluginJsonPath)) {
-        console.error(`[InternalPlugin] 内置插件 ${pluginName} 的 plugin.json 不存在:`, pluginJsonPath)
+        console.error(
+          `[InternalPlugin] 内置插件 ${pluginName} 的 plugin.json 不存在:`,
+          pluginJsonPath
+        )
         continue
       }
 

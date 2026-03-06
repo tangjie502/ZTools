@@ -143,7 +143,9 @@ class WebSearchAPI {
   /**
    * 更新搜索引擎
    */
-  public async updateEngine(engine: WebSearchEngine): Promise<{ success: boolean; error?: string }> {
+  public async updateEngine(
+    engine: WebSearchEngine
+  ): Promise<{ success: boolean; error?: string }> {
     if (!engine.id || !engine.name || !engine.url) {
       return { success: false, error: '名称和 URL 不能为空' }
     }

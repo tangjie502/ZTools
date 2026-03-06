@@ -295,9 +295,7 @@ async function addDroppedFile(filePath: string): Promise<void> {
 
 // 规范化待添加路径，去空、去重，避免重复触发
 function normalizePendingFiles(paths: string[]): string[] {
-  return Array.from(
-    new Set(paths.map((path) => path.trim()).filter((path) => Boolean(path)))
-  )
+  return Array.from(new Set(paths.map((path) => path.trim()).filter((path) => Boolean(path))))
 }
 
 // 消费来自 onPluginEnter 的待添加路径，循环调用 addByPath

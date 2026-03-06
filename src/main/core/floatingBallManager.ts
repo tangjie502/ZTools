@@ -80,15 +80,12 @@ class FloatingBallManager {
     )
 
     // 拖拽中 → 移动窗口
-    ipcMain.on(
-      'floating-ball-dragging',
-      (_event, data: { screenX: number; screenY: number }) => {
-        if (!this.ballWindow || this.ballWindow.isDestroyed()) return
-        const newX = data.screenX - this.dragOffsetX
-        const newY = data.screenY - this.dragOffsetY
-        this.ballWindow.setPosition(newX, newY, false)
-      }
-    )
+    ipcMain.on('floating-ball-dragging', (_event, data: { screenX: number; screenY: number }) => {
+      if (!this.ballWindow || this.ballWindow.isDestroyed()) return
+      const newX = data.screenX - this.dragOffsetX
+      const newY = data.screenY - this.dragOffsetY
+      this.ballWindow.setPosition(newX, newY, false)
+    })
 
     // 拖拽结束 → 保存位置
     ipcMain.on('floating-ball-drag-end', () => {
@@ -150,8 +147,12 @@ class FloatingBallManager {
 
     // 获取主显示器工作区（放在屏幕右边中间）
     const primaryDisplay = screen.getPrimaryDisplay()
-    const { width: screenWidth, height: screenHeight, x: workAreaX, y: workAreaY } =
-      primaryDisplay.workArea
+    const {
+      width: screenWidth,
+      height: screenHeight,
+      x: workAreaX,
+      y: workAreaY
+    } = primaryDisplay.workArea
 
     const x = workAreaX + screenWidth - BALL_SIZE - 30
     const y = workAreaY + Math.floor(screenHeight / 2) - Math.floor(BALL_SIZE / 2)

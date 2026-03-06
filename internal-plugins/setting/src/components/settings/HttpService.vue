@@ -76,7 +76,9 @@
         <div class="api-list">
           <div v-for="item in apiEndpoints" :key="item.path" class="api-item">
             <div class="api-header">
-              <span class="api-method" :class="item.method === 'GET' ? 'method-get' : ''">{{ item.method }}</span>
+              <span class="api-method" :class="item.method === 'GET' ? 'method-get' : ''">{{
+                item.method
+              }}</span>
               <code class="api-path">{{ item.path }}</code>
               <button class="btn btn-sm copy-curl-btn" @click="copyCurl(item)">复制 curl</button>
             </div>
@@ -119,9 +121,20 @@ interface ApiEndpoint {
 
 const apiEndpoints: ApiEndpoint[] = [
   { method: 'GET', path: '/', desc: '服务状态检测，返回 Hello ZTools（无需认证）', auth: false },
-  { method: 'POST', path: '/api/window/show', desc: '显示主窗口，可传 text 参数填充搜索框', auth: true, body: { text: '设置' } },
+  {
+    method: 'POST',
+    path: '/api/window/show',
+    desc: '显示主窗口，可传 text 参数填充搜索框',
+    auth: true,
+    body: { text: '设置' }
+  },
   { method: 'POST', path: '/api/window/hide', desc: '隐藏 ZTools 主窗口', auth: true },
-  { method: 'POST', path: '/api/window/toggle', desc: '切换 ZTools 主窗口显示/隐藏状态', auth: true }
+  {
+    method: 'POST',
+    path: '/api/window/toggle',
+    desc: '切换 ZTools 主窗口显示/隐藏状态',
+    auth: true
+  }
 ]
 
 function buildCurl(item: ApiEndpoint): string {

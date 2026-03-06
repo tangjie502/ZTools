@@ -58,11 +58,7 @@ class DetachedWindowManager {
   /**
    * 将分离窗口尺寸持久化到数据库（按插件名归档）
    */
-  private persistWindowSize(
-    pluginName: string,
-    width: number,
-    viewHeight: number
-  ): void {
+  private persistWindowSize(pluginName: string, width: number, viewHeight: number): void {
     try {
       const normalizedWidth = Math.max(MIN_WINDOW_WIDTH, Math.round(width))
       const normalizedHeight = Math.max(MIN_VIEW_HEIGHT, Math.round(viewHeight))
@@ -410,10 +406,7 @@ class DetachedWindowManager {
       }
     }
 
-    const handleShowPluginMenu = (
-      _event: Electron.IpcMainEvent,
-      menuItems: any[]
-    ): void => {
+    const handleShowPluginMenu = (_event: Electron.IpcMainEvent, menuItems: any[]): void => {
       // 验证事件来自这个窗口
       if (_event.sender.id !== win.webContents.id) return
 
@@ -483,7 +476,9 @@ class DetachedWindowManager {
       this.detachedWindowMap.delete(windowId)
     }
 
-    console.log(`[DetachedWindow] 已关闭插件 ${pluginPath} 的 ${windowIdsToClose.length} 个分离窗口`)
+    console.log(
+      `[DetachedWindow] 已关闭插件 ${pluginPath} 的 ${windowIdsToClose.length} 个分离窗口`
+    )
   }
 
   /**

@@ -321,7 +321,11 @@ class ClipboardManager {
 
       // 检查图片大小
       if (buffer.length > this.config.maxImageSize) {
-        console.log('[Clipboard] 图片过大，跳过保存:', (buffer.length / 1024 / 1024).toFixed(2), 'MB')
+        console.log(
+          '[Clipboard] 图片过大，跳过保存:',
+          (buffer.length / 1024 / 1024).toFixed(2),
+          'MB'
+        )
         return {
           id: uuidv4(),
           type: 'image',

@@ -199,10 +199,7 @@ class HttpServer {
     })
   }
 
-  private async routeRequest(
-    url: string,
-    body: Record<string, unknown>
-  ): Promise<ApiResponse> {
+  private async routeRequest(url: string, body: Record<string, unknown>): Promise<ApiResponse> {
     switch (url) {
       case '/api/window/show':
         return this.handleShowWindow(body)

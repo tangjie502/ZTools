@@ -326,7 +326,6 @@ export async function scanApplications(): Promise<Command[]> {
 
     // 创建任务数组,使用并发控制
     const tasks = allAppPaths.map((appPath) => async () => {
-      
       try {
         const name = await getAppDisplayName(appPath)
 

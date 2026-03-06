@@ -44,7 +44,8 @@ window.ztools = {
   // 在当前页面中查找文本
   findInPage: (text, options) => electron.ipcRenderer.invoke('find-in-page', text, options),
   // 停止查找
-  stopFindInPage: (action = 'clearSelection') => electron.ipcRenderer.invoke('stop-find-in-page', action),
+  stopFindInPage: (action = 'clearSelection') =>
+    electron.ipcRenderer.invoke('stop-find-in-page', action),
   // 监听页面查找结果
   onFindInPageResult: (callback) => {
     if (callback && typeof callback === 'function') {
@@ -248,7 +249,7 @@ window.ztools = {
 
     // 创建 Proxy 对象模拟 BrowserWindow
     const createProxy = (path = []) => {
-      return new Proxy(() => { }, {
+      return new Proxy(() => {}, {
         get: (target, prop) => {
           if (typeof prop !== 'string') return undefined
 
@@ -576,7 +577,10 @@ window.ztools = {
       await electron.ipcRenderer.invoke('internal:update-space-open-command', enabled),
     // 通知主渲染进程更新悬浮球双击目标指令
     updateFloatingBallDoubleClickCommand: async (command) =>
-      await electron.ipcRenderer.invoke('internal:update-floating-ball-double-click-command', command),
+      await electron.ipcRenderer.invoke(
+        'internal:update-floating-ball-double-click-command',
+        command
+      ),
     // 通知主渲染进程更新本地应用搜索配置
     updateLocalAppSearch: async (enabled) =>
       await electron.ipcRenderer.invoke('internal:update-local-app-search', enabled),
@@ -639,8 +643,7 @@ window.ztools = {
       await electron.ipcRenderer.invoke('super-panel:pin-command', command),
     unpinSuperPanelCommand: async (path, featureCode) =>
       await electron.ipcRenderer.invoke('super-panel:unpin-command', path, featureCode),
-    getSuperPanelPinned: async () =>
-      await electron.ipcRenderer.invoke('super-panel:get-pinned'),
+    getSuperPanelPinned: async () => await electron.ipcRenderer.invoke('super-panel:get-pinned'),
 
     // ==================== AI 模型管理 API ====================
     aiModels: {
@@ -681,8 +684,7 @@ window.ztools = {
       await electron.ipcRenderer.invoke('internal:http-server-save-config', config),
     httpServerRegenerateKey: async () =>
       await electron.ipcRenderer.invoke('internal:http-server-regenerate-key'),
-    httpServerStatus: async () =>
-      await electron.ipcRenderer.invoke('internal:http-server-status'),
+    httpServerStatus: async () => await electron.ipcRenderer.invoke('internal:http-server-status'),
 
     // ==================== 调试日志 API ====================
     logEnable: async () => await electron.ipcRenderer.invoke('internal:log-enable'),
@@ -759,7 +761,11 @@ electron.ipcRenderer.on('main-push-query', (event, { queryData, callId }) => {
 electron.ipcRenderer.on('main-push-select', (event, { selectData, callId }) => {
   try {
     let shouldEnterPlugin = false
-    if (mainPushCallback && mainPushCallback.selectCallback && typeof mainPushCallback.selectCallback === 'function') {
+    if (
+      mainPushCallback &&
+      mainPushCallback.selectCallback &&
+      typeof mainPushCallback.selectCallback === 'function'
+    ) {
       try {
         const result = mainPushCallback.selectCallback(selectData)
         if (result === true) {

@@ -343,7 +343,9 @@ declare global {
           add: (engine: any) => Promise<{ success: boolean; error?: string }>
           update: (engine: any) => Promise<{ success: boolean; error?: string }>
           delete: (id: string) => Promise<{ success: boolean; error?: string }>
-          fetchFavicon: (url: string) => Promise<{ success: boolean; data?: string; error?: string }>
+          fetchFavicon: (
+            url: string
+          ) => Promise<{ success: boolean; data?: string; error?: string }>
         }
 
         // 超级面板

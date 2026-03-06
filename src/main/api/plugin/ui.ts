@@ -21,7 +21,9 @@ export class PluginUIAPI {
     ipcMain.handle('show-notification', (event, body: string) => this.showNotification(event, body))
 
     // 设置插件高度
-    ipcMain.handle('set-expend-height', (event, height: number) => this.setExpendHeight(event, height))
+    ipcMain.handle('set-expend-height', (event, height: number) =>
+      this.setExpendHeight(event, height)
+    )
 
     // 子输入框相关
     ipcMain.handle('set-sub-input', (event, placeholder?: string, isFocus?: boolean) =>

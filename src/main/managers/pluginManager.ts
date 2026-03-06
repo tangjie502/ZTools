@@ -980,8 +980,16 @@ export class PluginManager {
         if (result.success && Array.isArray(result.results)) {
           // 处理图标路径：将相对路径转为 file:// URL（保留原始 icon 不变，用 _resolvedIcon 展示）
           const processed = result.results.map((item: any) => {
-            if (item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('file:') && !item.icon.startsWith('data:')) {
-              return { ...item, _resolvedIcon: pathToFileURL(path.join(pluginPath, item.icon)).href }
+            if (
+              item.icon &&
+              !item.icon.startsWith('http') &&
+              !item.icon.startsWith('file:') &&
+              !item.icon.startsWith('data:')
+            ) {
+              return {
+                ...item,
+                _resolvedIcon: pathToFileURL(path.join(pluginPath, item.icon)).href
+              }
             }
             return item
           })
@@ -1014,13 +1022,10 @@ export class PluginManager {
     return new Promise((resolve) => {
       const timeout = setTimeout(() => resolve(false), 3000)
 
-      plugin!.view.webContents.ipc.once(
-        `main-push-select-result-${callId}`,
-        (_event, result) => {
-          clearTimeout(timeout)
-          resolve(result.success && result.shouldEnterPlugin)
-        }
-      )
+      plugin!.view.webContents.ipc.once(`main-push-select-result-${callId}`, (_event, result) => {
+        clearTimeout(timeout)
+        resolve(result.success && result.shouldEnterPlugin)
+      })
 
       plugin!.view.webContents.send('main-push-select', { selectData, callId })
     })
@@ -1348,10 +1353,13 @@ export class PluginManager {
     const plugin = this.pluginViews.find((v) => v.path === pluginPath)
     if (!plugin) {
       console.warn('[Plugin] 未找到插件视图:', pluginPath)
-      console.log('[Plugin] 当前运行中的插件:', this.pluginViews.map(v => v.path))
+      console.log(
+        '[Plugin] 当前运行中的插件:',
+        this.pluginViews.map((v) => v.path)
+      )
       return null
     }
-    
+
     if (plugin.view.webContents.isDestroyed()) {
       console.warn('[Plugin] 插件 webContents 已销毁:', pluginPath)
       return null
@@ -1366,13 +1374,16 @@ export class PluginManager {
 
       // 找到对应进程的内存信息
       const processMetric = metrics.find((metric) => metric.pid === processId)
-      
+
       if (!processMetric) {
         console.warn('[Plugin] 未找到进程指标，进程ID:', processId)
-        console.log('[Plugin] 所有进程ID:', metrics.map(m => m.pid))
+        console.log(
+          '[Plugin] 所有进程ID:',
+          metrics.map((m) => m.pid)
+        )
         return null
       }
-      
+
       if (!processMetric.memory) {
         console.warn('[Plugin] 进程指标中没有内存信息:', processMetric)
         return null

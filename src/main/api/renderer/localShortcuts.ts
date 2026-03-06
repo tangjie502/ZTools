@@ -400,7 +400,12 @@ export class LocalShortcutsAPI {
       // 保存到数据库
       databaseAPI.dbPut(LOCAL_SHORTCUTS_KEY, shortcuts)
 
-      console.log('[LocalShortcut] 更新本地启动项别名成功:', shortcut.name, '->', shortcut.alias || '(无别名)')
+      console.log(
+        '[LocalShortcut] 更新本地启动项别名成功:',
+        shortcut.name,
+        '->',
+        shortcut.alias || '(无别名)'
+      )
 
       // 通知渲染进程刷新指令列表
       this.mainWindow?.webContents.send('apps-changed')

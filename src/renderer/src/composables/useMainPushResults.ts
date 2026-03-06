@@ -115,7 +115,12 @@ export function useMainPushResults(props: {
 
   // 监听搜索变化，带防抖
   watch(
-    [() => props.searchQuery, () => props.pastedText, () => props.pastedImage, () => props.pastedFiles],
+    [
+      () => props.searchQuery,
+      () => props.pastedText,
+      () => props.pastedImage,
+      () => props.pastedFiles
+    ],
     () => {
       if (queryTimer) {
         clearTimeout(queryTimer)
@@ -145,11 +150,7 @@ export function useMainPushResults(props: {
         payload: searchQuery,
         option: rawItem
       }
-      return await window.ztools.selectMainPush(
-        group.pluginPath,
-        group.featureCode,
-        selectData
-      )
+      return await window.ztools.selectMainPush(group.pluginPath, group.featureCode, selectData)
     } catch (error) {
       console.error(`[MainPush] 选择处理失败:`, error)
       return false

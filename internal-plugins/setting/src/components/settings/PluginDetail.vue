@@ -293,32 +293,15 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
-              <path
-                d="M7 9L7 15"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M12 9L12 15"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M17 9L17 15"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
+              <path d="M7 9L7 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M12 9L12 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M17 9L17 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
           </div>
           <div v-if="memoryLoading" class="meta-value">
             <span class="memory-loading">...</span>
           </div>
-          <div v-else-if="memoryInfo" class="meta-value">
-            {{ memoryInfo.total }} MB
-          </div>
+          <div v-else-if="memoryInfo" class="meta-value">{{ memoryInfo.total }} MB</div>
           <div v-else class="meta-value">-</div>
         </div>
       </div>
@@ -387,68 +370,68 @@
               </button>
             </div>
             <div class="data-list">
-            <div
-              v-for="item in docKeys"
-              :key="item.key"
-              class="card data-item"
-              :class="{ expanded: expandedDataId === item.key }"
-              @click="toggleDataDetail(item)"
-            >
-              <div class="data-header">
-                <span class="data-key">{{ item.key }}</span>
-                <div class="data-header-right">
-                  <span class="doc-type-badge" :class="`type-${item.type}`">
-                    {{ item.type === 'document' ? '文档' : '附件' }}
-                  </span>
-                  <svg
-                    class="expand-icon"
-                    :class="{ rotated: expandedDataId === item.key }"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M9 18L15 12L9 6"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <Transition name="expand">
-                <div v-if="expandedDataId === item.key" class="data-content">
-                  <div class="data-meta">
-                    <div class="data-meta-item">
-                      <span class="label">类型:</span>
-                      <span class="value type-badge" :class="`type-${currentDocType}`">
-                        {{ currentDocType === 'document' ? '文档' : '附件' }}
-                      </span>
-                    </div>
-                    <div v-if="currentDocContent?._rev" class="data-meta-item">
-                      <span class="label">版本:</span>
-                      <span class="value">{{ currentDocContent._rev }}</span>
-                    </div>
-                    <div
-                      v-if="currentDocContent?._updatedAt || currentDocContent?.updatedAt"
-                      class="data-meta-item"
+              <div
+                v-for="item in docKeys"
+                :key="item.key"
+                class="card data-item"
+                :class="{ expanded: expandedDataId === item.key }"
+                @click="toggleDataDetail(item)"
+              >
+                <div class="data-header">
+                  <span class="data-key">{{ item.key }}</span>
+                  <div class="data-header-right">
+                    <span class="doc-type-badge" :class="`type-${item.type}`">
+                      {{ item.type === 'document' ? '文档' : '附件' }}
+                    </span>
+                    <svg
+                      class="expand-icon"
+                      :class="{ rotated: expandedDataId === item.key }"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <span class="label">更新时间:</span>
-                      <span class="value">{{
-                        formatDate(currentDocContent._updatedAt || currentDocContent.updatedAt)
-                      }}</span>
-                    </div>
-                  </div>
-                  <div class="data-json">
-                    <pre>{{ formatJsonData(currentDocContent) }}</pre>
+                      <path
+                        d="M9 18L15 12L9 6"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
                   </div>
                 </div>
-              </Transition>
+                <Transition name="expand">
+                  <div v-if="expandedDataId === item.key" class="data-content">
+                    <div class="data-meta">
+                      <div class="data-meta-item">
+                        <span class="label">类型:</span>
+                        <span class="value type-badge" :class="`type-${currentDocType}`">
+                          {{ currentDocType === 'document' ? '文档' : '附件' }}
+                        </span>
+                      </div>
+                      <div v-if="currentDocContent?._rev" class="data-meta-item">
+                        <span class="label">版本:</span>
+                        <span class="value">{{ currentDocContent._rev }}</span>
+                      </div>
+                      <div
+                        v-if="currentDocContent?._updatedAt || currentDocContent?.updatedAt"
+                        class="data-meta-item"
+                      >
+                        <span class="label">更新时间:</span>
+                        <span class="value">{{
+                          formatDate(currentDocContent._updatedAt || currentDocContent.updatedAt)
+                        }}</span>
+                      </div>
+                    </div>
+                    <div class="data-json">
+                      <pre>{{ formatJsonData(currentDocContent) }}</pre>
+                    </div>
+                  </div>
+                </Transition>
+              </div>
             </div>
-          </div>
           </div>
           <div v-else class="empty-message">该插件暂无存储数据</div>
         </div>
@@ -956,7 +939,7 @@ async function loadMemoryInfo(): Promise<void> {
     console.log('[PluginDetail] 调用 API 获取内存信息，路径:', props.plugin.path)
     const result = await window.ztools.internal.getPluginMemoryInfo(props.plugin.path)
     console.log('[PluginDetail] API 返回结果:', result)
-    
+
     if (result.success && result.data) {
       console.log('[PluginDetail] 成功获取内存信息:', result.data)
       memoryInfo.value = result.data
@@ -975,7 +958,7 @@ async function loadMemoryInfo(): Promise<void> {
 // 启动内存信息定时更新
 function startMemoryUpdate(): void {
   console.log('[PluginDetail] 启动内存信息定时更新')
-  
+
   // 立即加载一次
   loadMemoryInfo()
 
@@ -1006,7 +989,7 @@ onMounted(() => {
     isRunning: props.isRunning,
     installed: props.plugin.installed
   })
-  
+
   // 无论是否安装，只要有插件信息就尝试加载
   if (props.plugin.name || props.plugin.path) {
     loadReadme()

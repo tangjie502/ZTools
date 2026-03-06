@@ -16,7 +16,12 @@
         @click="$emit('select', item, index)"
       >
         <div class="item-icon">
-          <img v-if="item._resolvedIcon || item.icon" :src="item._resolvedIcon || item.icon" alt="" draggable="false" />
+          <img
+            v-if="item._resolvedIcon || item.icon"
+            :src="item._resolvedIcon || item.icon"
+            alt=""
+            draggable="false"
+          />
         </div>
         <div class="item-content">
           <!-- eslint-disable-next-line vue/no-v-html -->

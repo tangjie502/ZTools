@@ -798,11 +798,7 @@ export class AppsAPI {
   /**
    * 从历史记录中删除
    */
-  private removeFromHistory(
-    appPath: string,
-    featureCode?: string,
-    name?: string
-  ): void {
+  private removeFromHistory(appPath: string, featureCode?: string, name?: string): void {
     try {
       const originalHistory: any[] = databaseAPI.dbGet('command-history') || []
 

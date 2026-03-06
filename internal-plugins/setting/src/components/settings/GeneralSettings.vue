@@ -366,8 +366,7 @@
         <div class="setting-label">
           <span>Tab 键目标指令</span>
           <span class="setting-desc"
-            >配置后在搜索框输入文字按 Tab 键可直接进入对应指令，常用于快速打开 AI
-            对话等场景</span
+            >配置后在搜索框输入文字按 Tab 键可直接进入对应指令，常用于快速打开 AI 对话等场景</span
           >
         </div>
         <div class="setting-control-column">
@@ -500,7 +499,6 @@
           </button>
         </div>
       </div>
-
     </div>
 
     <!-- ==================== 超级面板 ==================== -->
@@ -538,10 +536,7 @@
         </div>
       </div>
 
-      <div
-        v-if="superPanelEnabled && superPanelTriggerMode.endsWith('-long')"
-        class="setting-item"
-      >
+      <div v-if="superPanelEnabled && superPanelTriggerMode.endsWith('-long')" class="setting-item">
         <div class="setting-label">
           <span>长按响应时间</span>
           <span class="setting-desc">长按鼠标按键多少毫秒后弹出超级面板</span>

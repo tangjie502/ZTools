@@ -95,7 +95,10 @@ export class SettingsAPI {
           })
           // 应用全局代理
           await proxyManager.applyProxyToDefaultSession()
-          console.log('[Settings] 启动时应用代理配置:', { enabled: data.proxyEnabled, url: data.proxyUrl })
+          console.log('[Settings] 启动时应用代理配置:', {
+            enabled: data.proxyEnabled,
+            url: data.proxyUrl
+          })
         }
         // 应用窗口默认高度设置
         if (data.windowDefaultHeight !== undefined) {

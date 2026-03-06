@@ -132,13 +132,13 @@
 
           <!-- 系统应用/设置/本地启动：单个显示 -->
           <template
-            v-if="selectedSource?.subType === 'app' || selectedSource?.subType === 'system-setting' || selectedSource?.subType === 'local-shortcut'"
+            v-if="
+              selectedSource?.subType === 'app' ||
+              selectedSource?.subType === 'system-setting' ||
+              selectedSource?.subType === 'local-shortcut'
+            "
           >
-            <CommandCard
-              v-for="(cmd, index) in filteredSystemCommands"
-              :key="index"
-              :command="cmd"
-            >
+            <CommandCard v-for="(cmd, index) in filteredSystemCommands" :key="index" :command="cmd">
               <template #action>
                 <TagDropdown
                   :menu-items="getAppMenuItems(cmd)"
@@ -418,8 +418,7 @@ async function toggleSuperPanelPin(
   if (isPinned) {
     // 取消固定 - 需要找到对应的 path
     const item = superPanelPinned.value.find(
-      (i) =>
-        i.name === cmdName && i.featureCode === featureCode && i.pluginName === pluginName
+      (i) => i.name === cmdName && i.featureCode === featureCode && i.pluginName === pluginName
     )
     if (item) {
       await window.ztools.internal.unpinSuperPanelCommand(item.path, item.featureCode)
