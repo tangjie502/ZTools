@@ -438,7 +438,8 @@ export const useCommandDataStore = defineStore('commandData', () => {
           // 检查是否有 feature 的 cmd 名称与插件名称相同
           const hasPluginNameCmd = plugin.features.some((feature: any) =>
             feature.cmds?.some(
-              (cmd: any) => (typeof cmd === 'string' ? cmd : cmd.label) === plugin.name
+              (cmd: any) =>
+                (typeof cmd === 'string' ? cmd : cmd.label) === (plugin.title ?? plugin.name)
             )
           )
 
@@ -463,7 +464,7 @@ export const useCommandDataStore = defineStore('commandData', () => {
             }
 
             pluginItems.push({
-              name: plugin.name,
+              name: plugin.title ?? plugin.name,
               path: plugin.path,
               icon: plugin.logo,
               type: 'plugin',
