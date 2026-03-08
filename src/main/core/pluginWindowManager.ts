@@ -303,11 +303,12 @@ class PluginWindowManager {
    * 发送消息到父窗口
    */
   public sendToParent(senderWebContents: Electron.WebContents, channel: string, args: any[]): void {
+    const senderId = senderWebContents.id
     for (const windowInfo of this.windowInfoMap.values()) {
       if (windowInfo.window.webContents === senderWebContents) {
         const parent = windowInfo.parentWebContents
         if (parent && !parent.isDestroyed()) {
-          parent.send(channel, ...args)
+          parent.send('__ipc_sendto_relay__', { senderId, channel, args })
           return
         }
         break

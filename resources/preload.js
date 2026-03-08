@@ -39,6 +39,20 @@ if (!electron.ipcRenderer.sendTo) {
   }
 }
 
+// senderId 兼容层：接收主进程中继消息并分发到原始通道
+electron.ipcRenderer.on('__ipc_sendto_relay__', (_event, payload) => {
+  // 仅处理约定结构，避免异常 payload 影响插件运行
+  if (!payload || typeof payload !== 'object') return
+  const { senderId, channel, args } = payload
+  if (typeof senderId !== 'number') return
+  if (typeof channel !== 'string' || !channel) return
+  if (channel === '__ipc_sendto_relay__') return // 防止内部通道递归分发
+  if (!Array.isArray(args)) return
+
+  // 兼容边界：只补 senderId，不模拟完整 IpcRendererEvent
+  electron.ipcRenderer.emit(channel, { senderId }, ...args)
+})
+
 // 事件监听采用单回调模式：重复注册会替换之前的回调，避免插件热重载时累积多个监听器
 let enterCallback = null
 // 进入事件粘性缓存：解决 onPluginEnter 晚绑定导致的事件丢失

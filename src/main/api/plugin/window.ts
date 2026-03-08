@@ -192,11 +192,12 @@ export class PluginWindowAPI {
     })
 
     // ipcRenderer.sendTo polyfill
-    ipcMain.on('ipc-send-to', (_event, webContentsId: number, channel: string, ...args: any[]) => {
+    ipcMain.on('ipc-send-to', (event, webContentsId: number, channel: string, ...args: any[]) => {
+      const senderId = event.sender.id
       try {
         const targetWebContents = webContents.fromId(webContentsId)
         if (targetWebContents && !targetWebContents.isDestroyed()) {
-          targetWebContents.send(channel, ...args)
+          targetWebContents.send('__ipc_sendto_relay__', { senderId, channel, args })
         } else {
           console.warn(`[pluginWindow:method] 目标 webContents 不存在或已销毁: ${webContentsId}`)
         }
