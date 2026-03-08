@@ -3,8 +3,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useToast, AdaptiveIcon } from '@/components'
 import { PluginDetail, NpmInstallPanel } from './components'
 import { weightedSearch } from '@/utils'
-import { useHistoryState, useZtoolsSubInput } from '@/composables'
-import { onBeforeRouteUpdate, useRouter } from 'vue-router'
+import { useJumpFunction, useZtoolsSubInput } from '@/composables'
+import { useRouter } from 'vue-router'
 
 // const emit = defineEmits<{
 //   (e: 'add-dev-consumed'): void
@@ -461,23 +461,14 @@ onMounted(async () => {
 })
 
 // 处理对应 ztools code 进来的功能
-const handleJumpZtoolsCode = (): void => {
-  const state = useHistoryState<{
-    localAddDevPluginFilePath: string
-    autoOpenPluginName: string
-  }>()
+useJumpFunction((state) => {
+  void loadRunningPlugins()
   if (state.localAddDevPluginFilePath) {
-    addDevPluginByFilePath(state.localAddDevPluginFilePath)
+    void addDevPluginByFilePath(state.localAddDevPluginFilePath)
   } else if (state.autoOpenPluginName) {
     setSubInput(state.autoOpenPluginName)
     openPluginByName(state.autoOpenPluginName)
   }
-}
-onMounted(() => {
-  handleJumpZtoolsCode()
-})
-onBeforeRouteUpdate(() => {
-  handleJumpZtoolsCode()
 })
 
 onUnmounted(() => {

@@ -111,8 +111,10 @@ export function initZtoolsBaseEventHandler(options: InitBaseEventHandlerOptions 
   }
 
   addZtoolsCodeEventListener('ui.router', (e) => {
-    console.log('ui.router', e)
-    e.router.replace({ name: e.getParamsKey('router'), query: { ...e.params } }).then(() => {})
+    console.log('[code-event] ui.router 收到消息', e)
+    e.router
+      .replace({ name: e.getParamsKey('router'), query: { ...e.params, t: Date.now() } })
+      .then(() => {})
     if (height) {
       ztools.setExpendHeight(height)
     }
