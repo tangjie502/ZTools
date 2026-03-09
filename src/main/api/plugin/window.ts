@@ -38,7 +38,7 @@ export class PluginWindowAPI {
         }
 
         // URL 安全校验（仅允许 .html 或 http）
-        if (!url.startsWith('http')) {
+        if (url.startsWith('http')) {
           event.returnValue = new Error('The URL must be a local address starting with file://')
           return
         }
