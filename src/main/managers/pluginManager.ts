@@ -33,6 +33,7 @@ interface PluginViewInfo {
   subInputVisible?: boolean // 子输入框是否可见
   logo?: string
   isDevelopment?: boolean
+  backgroundRunning?: boolean // plugin.json pluginSetting.backgroundRunning，后台不节流
 }
 
 export class PluginManager {
@@ -133,6 +134,31 @@ export class PluginManager {
     })
     view.setBackgroundColor('#00000000')
     return view
+  }
+
+  /**
+   * 按插件后台运行策略设置 WebContents 节流
+   * @param view 插件视图
+   * @param pluginPath 插件路径（用于读取缓存中的 backgroundRunning 配置）
+   * @param hidden true=视图处于后台/隐藏态；false=视图处于前台展示态
+   */
+  private applyBackgroundThrottlingByPolicy(
+    view: WebContentsView,
+    pluginPath: string | null | undefined,
+    hidden: boolean
+  ): void {
+    if (view.webContents.isDestroyed()) return
+
+    // 前台展示时始终关闭节流，保证交互响应
+    if (!hidden) {
+      view.webContents.backgroundThrottling = false
+      return
+    }
+
+    // 后台态：仅当插件声明 backgroundRunning=true 时保持不节流
+    const backgroundRunning =
+      !!pluginPath && !!this.pluginViews.find((v) => v.path === pluginPath)?.backgroundRunning
+    view.webContents.backgroundThrottling = !backgroundRunning
   }
 
   /**
@@ -287,6 +313,9 @@ export class PluginManager {
     this.pluginView = cached.view
     this.mainWindow.contentView.addChildView(this.pluginView)
 
+    // 恢复显示时关闭节流
+    this.applyBackgroundThrottlingByPolicy(this.pluginView, pluginPath, false)
+
     console.log('[Plugin] 插件视图获取焦点')
     this.pluginView.webContents.focus()
 
@@ -377,7 +406,8 @@ export class PluginManager {
         subInputPlaceholder: '搜索',
         subInputVisible: false,
         logo: logoUrl,
-        isDevelopment
+        isDevelopment,
+        backgroundRunning: !!pluginConfig.pluginSetting?.backgroundRunning
       }
       this.pluginViews.push(pluginInfo)
       this.currentPluginPath = pluginPath
@@ -538,6 +568,8 @@ export class PluginManager {
 
       // 仅移除视图以达到隐藏效果，但保留实例以便复用
       this.mainWindow.contentView.removeChildView(pluginView)
+      // 隐藏时按策略决定是否启用节流
+      this.applyBackgroundThrottlingByPolicy(pluginView, currentPath, true)
       console.log('[Plugin] Plugin WebContentsView 已隐藏，缓存保留')
 
       // 将当前引用清空，但缓存仍保留
@@ -631,9 +663,13 @@ export class PluginManager {
         subInputPlaceholder: '搜索',
         subInputVisible: false,
         logo: logoUrl,
-        isDevelopment
+        isDevelopment,
+        backgroundRunning: !!pluginConfig.pluginSetting?.backgroundRunning
       }
       this.pluginViews.push(pluginInfo)
+
+      // 预加载后视图处于后台态，按策略设置节流（默认启用，backgroundRunning=true 例外）
+      this.applyBackgroundThrottlingByPolicy(view, pluginPath, true)
 
       // 加载插件 URL
       view.webContents.loadURL(pluginUrl)
