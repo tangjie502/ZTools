@@ -8,8 +8,12 @@ import { Command } from './types'
 import { pLimit } from './utils'
 
 interface LocalizedAppMetadata {
-  name?: string
+  name: string
   aliases?: string[]
+}
+
+function uniqueNonEmpty(values: Array<string | undefined | null>): string[] {
+  return [...new Set(values.map((value) => value?.trim()).filter(Boolean) as string[])]
 }
 
 // 缓存系统语言对应的 lproj 目录名列表
@@ -285,13 +289,9 @@ async function getLocalizedMetadata(appPath: string): Promise<LocalizedAppMetada
   )
 }
 
-// 获取应用显示名称（优先本地化名称，无需子进程）
-async function getAppDisplayInfo(appPath: string): Promise<LocalizedAppMetadata> {
-  // 1. 尝试从 .lproj 获取本地化名称（如 "时钟"、"访达"）
-  const localizedMetadata = await getLocalizedMetadata(appPath)
-  if (localizedMetadata?.name) return localizedMetadata
+async function getBundleNames(appPath: string): Promise<string[]> {
+  const fileName = path.basename(appPath, '.app')
 
-  // 2. 从 Info.plist 读取 CFBundleDisplayName / CFBundleName
   try {
     const data: any = await new Promise((resolve, reject) => {
       const plistPath = path.join(appPath, 'Contents', 'Info.plist')
@@ -300,13 +300,31 @@ async function getAppDisplayInfo(appPath: string): Promise<LocalizedAppMetadata>
         else resolve(result)
       })
     })
-    const name = data?.CFBundleDisplayName || data?.CFBundleName
-    if (name) return { name }
+
+    return uniqueNonEmpty([data?.CFBundleDisplayName, data?.CFBundleName, fileName])
   } catch {
-    // ignore
+    return uniqueNonEmpty([fileName])
   }
-  // 3. 兜底：使用文件名
-  return { name: path.basename(appPath, '.app') }
+}
+
+// 获取应用显示名称（优先本地化名称，无需子进程）
+async function getAppDisplayInfo(appPath: string): Promise<LocalizedAppMetadata> {
+  const bundleNames = await getBundleNames(appPath)
+
+  // 1. 尝试从 .lproj 获取本地化名称（如 "时钟"、"访达"）
+  const localizedMetadata = await getLocalizedMetadata(appPath)
+  if (localizedMetadata?.name) {
+    return {
+      name: localizedMetadata.name,
+      aliases: uniqueNonEmpty([...bundleNames, ...(localizedMetadata.aliases || [])]).filter(
+        (alias) => alias !== localizedMetadata.name
+      )
+    }
+  }
+
+  // 2. 兜底：使用 bundle 原名 / 文件名
+  const [name, ...aliases] = bundleNames
+  return { name, aliases }
 }
 
 // 获取应用图标文件路径
@@ -386,6 +404,9 @@ export async function scanApplications(): Promise<Command[]> {
     const tasks = allAppPaths.map((appPath) => async () => {
       try {
         const { name, aliases } = await getAppDisplayInfo(appPath)
+        const acronymSource = [name, ...(aliases || [])].find(
+          (value) => extractAcronym(value) !== ''
+        )
 
         // 获取图标文件路径
         const iconPath = await getIconFile(appPath)
@@ -398,7 +419,7 @@ export async function scanApplications(): Promise<Command[]> {
           path: appPath,
           icon: iconUrl,
           aliases,
-          acronym: extractAcronym(name)
+          acronym: acronymSource ? extractAcronym(acronymSource) : ''
         }
       } catch {
         const defaultIconPath =

@@ -30,7 +30,7 @@ interface LastMatchState {
  * 应用管理API - 主程序专用
  */
 export class AppsAPI {
-  private static readonly APP_CACHE_VERSION = 2
+  private static readonly APP_CACHE_VERSION = 3
   private static readonly APP_CACHE_VERSION_KEY = 'cached-commands-version'
   private mainWindow: Electron.BrowserWindow | null = null
   private pluginManager: PluginManager | null = null
@@ -527,7 +527,7 @@ export class AppsAPI {
    */
   private async addToHistory(options: {
     path: string
-    type?: 'app' | 'plugin' | 'builtin'
+    type?: 'app' | 'plugin' | 'builtin' | 'file'
     featureCode?: string
     param?: any
     name?: string // cmd 名称（用于历史记录显示）
