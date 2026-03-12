@@ -17,7 +17,7 @@ interface MatchInfo {
 export function highlightMatch(
   text: string,
   matches?: MatchInfo[],
-  matchType?: 'acronym' | 'name' | 'pinyin' | 'pinyinAbbr',
+  matchType?: 'acronym' | 'name' | 'aliases' | 'pinyin' | 'pinyinAbbr',
   query?: string
 ): string {
   if (!matches || matches.length === 0) {
@@ -48,8 +48,8 @@ export function highlightMatch(
   const highlightIndices = new Set<number>()
 
   matches.forEach((match) => {
-    if (match.key === 'name') {
-      // 直接使用 name 的索引
+    if (match.key === 'name' || match.key === 'aliases') {
+      // 直接使用 name / aliases 的索引
       match.indices.forEach(([start, end]) => {
         for (let i = start; i <= end; i++) {
           highlightIndices.add(i)

@@ -7,7 +7,8 @@ import settingsFillIcon from '../assets/image/settings-fill.png'
 import {
   getCommandId as _getCommandId,
   applySpecialConfig as _applySpecialConfig,
-  calculateMatchScore as _calculateMatchScore
+  calculateMatchScore as _calculateMatchScore,
+  getMatchedDisplayName as _getMatchedDisplayName
 } from './commandUtils'
 
 // 正则匹配指令
@@ -88,7 +89,8 @@ export interface Command {
   cmdType?: 'text' | 'regex' | 'over' | 'img' | 'files' // cmd类型
   mainPush?: boolean // 是否为 mainPush 功能（搜索时动态查询插件获取结果）
   matches?: MatchInfo[] // 搜索匹配信息（用于高亮显示）
-  matchType?: 'acronym' | 'name' | 'pinyin' | 'pinyinAbbr' // 匹配类型（用于高亮算法选择）
+  matchType?: 'acronym' | 'name' | 'aliases' | 'pinyin' | 'pinyinAbbr' // 匹配类型（用于高亮算法选择）
+  displayName?: string // 搜索结果展示名称（命中 aliases 时优先显示别名）
   // 系统设置字段（新增）
   settingUri?: string // ms-settings URI
   category?: string // 分类（用于分组显示）
@@ -697,13 +699,15 @@ export const useCommandDataStore = defineStore('commandData', () => {
       bestMatches = fuseResults
         .map((r) => {
           // 检测匹配类型（用于前端高亮算法选择）
-          let matchType: 'acronym' | 'name' | 'pinyin' | 'pinyinAbbr' | undefined
+          let matchType: 'acronym' | 'name' | 'aliases' | 'pinyin' | 'pinyinAbbr' | undefined
           if (r.matches && r.matches.length > 0) {
-            // 优先级：acronym > name > pinyin > pinyinAbbr
+            // 优先级：acronym > name > aliases > pinyin > pinyinAbbr
             if (r.matches.some((m) => m.key === 'acronym')) {
               matchType = 'acronym'
             } else if (r.matches.some((m) => m.key === 'name')) {
               matchType = 'name'
+            } else if (r.matches.some((m) => m.key === 'aliases')) {
+              matchType = 'aliases'
             } else if (r.matches.some((m) => m.key === 'pinyin')) {
               matchType = 'pinyin'
             } else if (r.matches.some((m) => m.key === 'pinyinAbbr')) {
@@ -715,13 +719,14 @@ export const useCommandDataStore = defineStore('commandData', () => {
             ...r.item,
             matches: r.matches as MatchInfo[],
             matchType,
+            displayName: _getMatchedDisplayName(r.item, r.matches as MatchInfo[]),
             _score: r.score || 0
           }
         })
         .sort((a, b) => {
           // 自定义排序：优先连续匹配
-          const scoreA = calculateMatchScore(a.name, query, a.matches)
-          const scoreB = calculateMatchScore(b.name, query, b.matches)
+          const scoreA = calculateMatchScore(a.displayName || a.name, query, a.matches)
+          const scoreB = calculateMatchScore(b.displayName || b.name, query, b.matches)
           return scoreB - scoreA // 分数高的排前面
         })
 

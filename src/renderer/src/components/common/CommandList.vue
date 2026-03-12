@@ -31,7 +31,7 @@
           />
           <!-- 占位图标（无图标或加载失败时显示） -->
           <div v-else class="app-icon-placeholder">
-            {{ app.name.charAt(0).toUpperCase() }}
+            {{ getDisplayName(app).charAt(0).toUpperCase() }}
           </div>
           <!-- eslint-disable-next-line vue/no-v-html -->
           <span class="app-name" v-html="getHighlightedName(app)"></span>
@@ -61,7 +61,7 @@
         />
         <!-- 占位图标（无图标或加载失败时显示） -->
         <div v-else class="app-icon-placeholder">
-          {{ app.name.charAt(0).toUpperCase() }}
+          {{ getDisplayName(app).charAt(0).toUpperCase() }}
         </div>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span class="app-name" v-html="getHighlightedName(app)"></span>
@@ -165,7 +165,11 @@ watch(
 )
 
 function getHighlightedName(app: Command): string {
-  return highlightMatch(app.name, app.matches, app.matchType, props.searchQuery)
+  return highlightMatch(getDisplayName(app), app.matches, app.matchType, props.searchQuery)
+}
+
+function getDisplayName(app: Command): string {
+  return app.displayName || app.name
 }
 
 // 获取 title 文本（悬浮提示）
@@ -177,6 +181,10 @@ function getTitleText(app: Command): string {
   }
 
   // 其他类型：显示名称
+  if (app.displayName && app.displayName !== app.name) {
+    return `${app.displayName}\n${app.name}`
+  }
+
   return app.name
 }
 

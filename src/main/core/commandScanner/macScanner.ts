@@ -12,6 +12,33 @@ interface LocalizedAppMetadata {
   aliases?: string[]
 }
 
+function flattenLocalizedNames(items: LocalizedAppMetadata[]): string[] {
+  return uniqueNonEmpty(items.flatMap((item) => [item.name, ...(item.aliases || [])]))
+}
+
+export function buildAppDisplayInfo(
+  bundleNames: string[],
+  localizedMetadata: LocalizedAppMetadata | null,
+  allLocalizedMetadata: LocalizedAppMetadata[] = []
+): LocalizedAppMetadata {
+  const localizedNames = flattenLocalizedNames(allLocalizedMetadata)
+
+  if (localizedMetadata?.name) {
+    return {
+      name: localizedMetadata.name,
+      aliases: uniqueNonEmpty([...bundleNames, ...localizedNames]).filter(
+        (alias) => alias !== localizedMetadata.name
+      )
+    }
+  }
+
+  const [name, ...aliases] = uniqueNonEmpty([...bundleNames, ...localizedNames])
+  return {
+    name,
+    aliases
+  }
+}
+
 function uniqueNonEmpty(values: Array<string | undefined | null>): string[] {
   return [...new Set(values.map((value) => value?.trim()).filter(Boolean) as string[])]
 }
@@ -289,6 +316,77 @@ async function getLocalizedMetadata(appPath: string): Promise<LocalizedAppMetada
   )
 }
 
+async function getAllLocalizedMetadataFromLproj(appPath: string): Promise<LocalizedAppMetadata[]> {
+  const resourcesPath = path.join(appPath, 'Contents', 'Resources')
+
+  try {
+    const entries = await fs.readdir(resourcesPath, { withFileTypes: true })
+    const lprojDirs = entries.filter(
+      (entry) => entry.isDirectory() && entry.name.endsWith('.lproj')
+    )
+
+    const results: LocalizedAppMetadata[] = []
+    for (const dir of lprojDirs) {
+      const stringsPath = path.join(resourcesPath, dir.name, 'InfoPlist.strings')
+      if (!fsSync.existsSync(stringsPath)) continue
+
+      const data = await readStringsFile(stringsPath)
+      const name = data?.CFBundleDisplayName || data?.CFBundleName
+      if (!name) continue
+
+      results.push({
+        name,
+        aliases: extractLocalizedAliases(data, name)
+      })
+    }
+
+    return results
+  } catch {
+    return []
+  }
+}
+
+async function getAllLocalizedMetadataFromLoctable(
+  appPath: string
+): Promise<LocalizedAppMetadata[]> {
+  const loctablePath = path.join(appPath, 'Contents', 'Resources', 'InfoPlist.loctable')
+  if (!fsSync.existsSync(loctablePath)) return []
+
+  try {
+    const data: any = await new Promise((resolve, reject) => {
+      plist.readFile(loctablePath, (err: any, result: any) => {
+        if (err) reject(err)
+        else resolve(result)
+      })
+    })
+
+    if (!data || typeof data !== 'object') {
+      return []
+    }
+
+    return Object.values(data)
+      .map((entry: any) => {
+        const name = entry?.CFBundleDisplayName || entry?.CFBundleName
+        if (!name) return null
+
+        return {
+          name,
+          aliases: extractLocalizedAliases(entry, name)
+        }
+      })
+      .filter(Boolean) as LocalizedAppMetadata[]
+  } catch {
+    return []
+  }
+}
+
+async function getAllLocalizedMetadata(appPath: string): Promise<LocalizedAppMetadata[]> {
+  return [
+    ...(await getAllLocalizedMetadataFromLproj(appPath)),
+    ...(await getAllLocalizedMetadataFromLoctable(appPath))
+  ]
+}
+
 async function getBundleNames(appPath: string): Promise<string[]> {
   const fileName = path.basename(appPath, '.app')
 
@@ -310,21 +408,13 @@ async function getBundleNames(appPath: string): Promise<string[]> {
 // 获取应用显示名称（优先本地化名称，无需子进程）
 async function getAppDisplayInfo(appPath: string): Promise<LocalizedAppMetadata> {
   const bundleNames = await getBundleNames(appPath)
+  const allLocalizedMetadata = await getAllLocalizedMetadata(appPath)
 
   // 1. 尝试从 .lproj 获取本地化名称（如 "时钟"、"访达"）
   const localizedMetadata = await getLocalizedMetadata(appPath)
-  if (localizedMetadata?.name) {
-    return {
-      name: localizedMetadata.name,
-      aliases: uniqueNonEmpty([...bundleNames, ...(localizedMetadata.aliases || [])]).filter(
-        (alias) => alias !== localizedMetadata.name
-      )
-    }
-  }
 
-  // 2. 兜底：使用 bundle 原名 / 文件名
-  const [name, ...aliases] = bundleNames
-  return { name, aliases }
+  // 2. 显示名优先使用当前系统语言，本地化的其他语言名称全部作为别名参与搜索
+  return buildAppDisplayInfo(bundleNames, localizedMetadata, allLocalizedMetadata)
 }
 
 // 获取应用图标文件路径

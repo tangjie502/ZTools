@@ -30,7 +30,7 @@ interface LastMatchState {
  * 应用管理API - 主程序专用
  */
 export class AppsAPI {
-  private static readonly APP_CACHE_VERSION = 3
+  private static readonly APP_CACHE_VERSION = 4
   private static readonly APP_CACHE_VERSION_KEY = 'cached-commands-version'
   private mainWindow: Electron.BrowserWindow | null = null
   private pluginManager: PluginManager | null = null

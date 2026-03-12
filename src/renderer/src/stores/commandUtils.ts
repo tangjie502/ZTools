@@ -101,3 +101,18 @@ export function calculateMatchScore(text: string, query: string, matches?: Match
 
   return score
 }
+
+/**
+ * 获取搜索结果的展示名称
+ * 命中 aliases 时，优先展示命中的别名，达到“多 cmd”近似体验
+ */
+export function getMatchedDisplayName<T extends { name: string }>(
+  command: T,
+  matches?: MatchInfo[]
+): string {
+  const aliasMatch = matches?.find(
+    (match) => match.key === 'aliases' && typeof match.value === 'string' && match.value.trim()
+  )
+
+  return aliasMatch?.value || command.name
+}

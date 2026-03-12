@@ -44,7 +44,7 @@ defineEmits<{
 }>()
 
 function getHighlightedName(app: Command): string {
-  return highlightMatch(app.name, app.matches, app.matchType, props.searchQuery)
+  return highlightMatch(app.displayName || app.name, app.matches, app.matchType, props.searchQuery)
 }
 </script>
 
